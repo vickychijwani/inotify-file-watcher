@@ -1,0 +1,45 @@
+Description:
+------------
+Inotify File Watcher is a program which, when given a list of files to watch (usually in the directory where it is executed), monitors them for modifications and runs a list of arbitrary commands on a file when it is modified.
+
+
+Caveats:
+--------
+Note that it uses the Linux "inotify" library which monitors *files*, NOT paths. That means that if you are monitoring the file ~/foo/bar and it gets overwritten with another file somehow, the inotify watch associated with the original file goes away, so it's kinda useless in that case. Also, Emacs and Vim use a backup/save strategy which results in them moving the original file to another location (~/foo/bar~, in the case of Emacs), so it doesn't work if you edit a watched file using Emacs/Vim or a similar text editor (If you're using Emacs, you can disable the automatic creation of backup files, like I have. For that, put this in your .emacs:
+
+    (setq make-backup-files nil)
+
+That'll make Emacs work with this watcher).
+
+
+Installation Instructions:
+--------------------------
+From the project root, execute the following commands on the shell:
+
+$ cd src/
+$ cc watcher.c -o watcher
+
+That should give you an executable file called "watcher". Now copy that executable to the directory in which you want to watch files. Next, create two files in your watched directory:
+
+1. watcher.files : A text file containing a list of files to be watched, each on a new line with no extra whitespace at either end of the line. The file paths given can be either relative to the watched directory, or absolute.
+
+2. watcher.commands : A text file containing a list of commands to be executed when a watched file is modified. If you want to insert the modified file's path in a command, use "%s" instead of it, and watcher will take care of substituting the file path when running the command.
+
+
+Example Use Case:
+-----------------
+Let's the use case (which actually served as the inspiration for this tool). I have a git repository of "dotfiles" (i.e., configuration files, including my .bashrc, .emacs, and gitconfig, among others), and want my computer to be able to automatically make a commit and push it to GitHub when I modify any of those dotfiles. So I don't have to worry about pushing my .emacs to GitHub after the umpteenth change. Cool huh? Oh, and, by the way, the repository I'm talking about is located at https://github.com/vickychijwani/dotfiles. So, I compiled and placed the watcher executable into the local copy of my dotfiles repository and wrote up my watcher.files and watcher.commands like so:
+
+watcher.files :-
+/home/vicky/.emacs
+/home/vicky/.gitconfig
+/home/vicky/.bashrc
+/home/vicky/.prxy
+/home/vicky/.vimrc
+/home/vicky/.bash_aliases
+
+watcher.commands :-
+git commit -am "modified %s"
+git push origin master || notify-send "Dotfiles Watcher" "git push failed."
+
+See the watcher.commands carefully. It first makes a commit to update the modified file with a commit message saying the file was modified, and then it pushes to GitHub (or, if the push fails, notifies me using Ubuntu's native notification system, notify-send). That's about it.
