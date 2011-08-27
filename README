@@ -9,7 +9,7 @@ Note that it uses the Linux "inotify" library which monitors *files*, NOT paths.
 
     (setq make-backup-files nil)
 
-That'll make Emacs work with this watcher).
+That'll make Emacs work with this watcher. Beware of the downsides of disabling automatic backup creation, however.).
 
 
 Installation Instructions:
@@ -34,7 +34,7 @@ watcher.files :-
 /home/vicky/.emacs
 /home/vicky/.gitconfig
 /home/vicky/.bashrc
-/home/vicky/.prxy
+/home/vicky/.zshrc
 /home/vicky/.vimrc
 /home/vicky/.bash_aliases
 
