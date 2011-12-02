@@ -27,17 +27,23 @@ Use Cases:
 2. Let's see the use case which actually served as the inspiration for this tool. I have a git repository of "dotfiles" (i.e., configuration files, including my .bashrc, .emacs, and .gitconfig, among others), and want my computer to be able to automatically make a commit and push it to GitHub when I modify any of those dotfiles, so I don't have to worry about pushing my .emacs to GitHub after the umpteenth change. Cool huh? Oh, and, by the way, the repository I'm talking about is located at https://github.com/vickychijwani/dotfiles. So, I compiled and placed the watcher executable into the local copy of my dotfiles repository and wrote up my watcher.files and watcher.commands like so:
 
 watcher.files :-
+
+```
 /home/vicky/.emacs
 /home/vicky/.gitconfig
 /home/vicky/.bashrc
 /home/vicky/.zshrc
 /home/vicky/.vimrc
 /home/vicky/.bash_aliases
+```
 
 watcher.commands :-
+
+```
 cp %s .
 git commit -am "modified %s"
 git push origin master || notify-send "Dotfiles Watcher" "git push failed."
+```
 
 See the watcher.commands carefully. It first copies the file, makes a commit to update the modified file with a commit message saying the file was modified (the "%s" represents the path of the modified file), and then it pushes to GitHub (or, if the push fails, notifies me using Ubuntu's native notification system, notify-send).
 
